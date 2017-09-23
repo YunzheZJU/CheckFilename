@@ -93,7 +93,7 @@ for str_week in weeks:
             f.write("These files are missed.\n=======================\n\n")
             for sid in failed.keys():
                 f.write(sid + "\n" + "\n".join(failed[sid][1]) + "\n\n")
-            f.write("\n\n=====================================\n")
+            f.write("\n\n=======================\n")
     finally:
         if f:
             f.close()
