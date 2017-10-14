@@ -50,32 +50,30 @@ for str_week in weeks:
                             file_path = os.path.join(dir_sid, check_name)
                             try:
                                 wav_file = wave.open(file_path)
+                                nChannels, depth, frequency = wav_file.getparams()[:3]
+                                wav_file.close()
+                                if nChannels == 1:
+                                    if depth == 2:
+                                        if frequency == 8000:
+                                            # All OK! Move the file to result folder
+                                            print "Success: " + check_name
+                                            shutil.move(file_path, os.path.join(dir_sid_result, check_name))
+                                            continue
+                                        else:
+                                            # Wrong Frequency
+                                            print "Failure: " + check_name + " with Frequency of " + str(frequency)
+                                            status[sid]["problems"].append([speed + str(num + 1), "采样率非8000Hz"])
+                                    else:
+                                        # Wrong Depth
+                                        print "Failure: " + check_name + " with Depth of " + str(depth * 8)
+                                        status[sid]["problems"].append([speed + str(num + 1), "位深度非16位"])
+                                else:
+                                    # Wrong nChannels
+                                    print "Failure: " + check_name + " with Channels of " + str(nChannels)
+                                    status[sid]["problems"].append([speed + str(num + 1), "非单通道"])
                             except:
                                 print "Fail to open file: " + file_path
-                                status[sid]["status"] = "格式错误"
                                 status[sid]["problems"].append([speed + str(num + 1), "无法读取"])
-                                continue
-                            nChannels, depth, frequency = wav_file.getparams()[:3]
-                            wav_file.close()
-                            if nChannels == 1:
-                                if depth == 2:
-                                    if frequency == 8000:
-                                        # All OK! Move the file to result folder
-                                        print "Success: " + check_name
-                                        shutil.move(file_path, os.path.join(dir_sid_result, check_name))
-                                        continue
-                                    else:
-                                        # Wrong Frequency
-                                        print "Failure: " + check_name + " with Frequency of " + str(frequency)
-                                        status[sid]["problems"].append([speed + str(num + 1), "采样率非8000Hz"])
-                                else:
-                                    # Wrong Depth
-                                    print "Failure: " + check_name + " with Depth of " + str(depth * 8)
-                                    status[sid]["problems"].append([speed + str(num + 1), "位深度非16位"])
-                            else:
-                                # Wrong nChannels
-                                print "Failure: " + check_name + " with Channels of " + str(nChannels)
-                                status[sid]["problems"].append([speed + str(num + 1), "非单通道"])
                         else:
                             # Miss file
                             print "Failure: " + check_name + " Not Found"
@@ -92,7 +90,7 @@ for str_week in weeks:
             for sid in status.keys():
                 m_status = status[sid]["status"]
                 f.write(sid + "\t" + m_status + "\t")
-                if m_status != "全部通过" and m_status != "未提交":
+                if m_status == "存在错误":
                     # Problem exists
                     f.write(str(18 - len(status[sid]["problems"])))
                     for problem in status[sid]["problems"]:
