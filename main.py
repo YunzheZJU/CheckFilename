@@ -24,6 +24,7 @@ weeks = os.listdir(dir_sample)
 for str_week in weeks:
     passed = []
     failed = {}
+    failedFiles = []
     missing = []
     dictionary = {}
     dir_week = os.path.join(dir_sample, str_week)
@@ -47,7 +48,9 @@ for str_week in weeks:
         for filename in files:
             result = re_filename.match(filename)
             if (result is None) or (dictionary.get(result.group(1)) is None):
-                shutil.move(dir_sid + "\\" + filename, dir_failed + "\\" + str_week + "_" + folder + "_" + filename)
+                failedName = str_week + "\\" + folder + "\\" + filename
+                failedFiles.append(failedName)
+                shutil.move(dir_sid + "\\" + filename, dir_failed + "\\" + failedName.replace("\\", "_"))
             else:
                 dictionary[result.group(1)] -= 1
 
@@ -88,7 +91,7 @@ for str_week in weeks:
                     + "\n\n=======================\n")
             f.write("These Sids are missed.\n=======================\n\n" + "\n".join(missing)
                     + "\n\n=======================\n")
-            f.write("These files are failed.\n=======================\n\n" + "\n".join(os.listdir(dir_failed))
+            f.write("These files are failed.\n=======================\n\n" + "\n".join(failedFiles)
                     + "\n\n=======================\n")
             f.write("These files are missed.\n=======================\n\n")
             for sid in failed.keys():
