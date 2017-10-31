@@ -22,6 +22,7 @@ make_dirs([dir_sample, dir_result, dir_report, dir_time])
 # Process within each week folder
 weeks = os.listdir(dir_sample)
 for str_week in weeks:
+    print str_week + ": Processing..."
     status = {}
     dir_week = os.path.join(dir_sample, str_week)
     dir_week_result = os.path.join(dir_result, str_week)
@@ -56,27 +57,32 @@ for str_week in weeks:
                                     if depth == 2:
                                         if frequency == 8000:
                                             # All OK! Move the file to result folder
-                                            print "Success: " + check_name
-                                            shutil.move(file_path, os.path.join(dir_sid_result, check_name))
+                                            # print "Success: " + check_name
+                                            shutil.copy(file_path, os.path.join(dir_sid_result, check_name))
                                             continue
                                         else:
                                             # Wrong Frequency
-                                            print "Failure: " + check_name + " with Frequency of " + str(frequency)
+                                            # print "Failure: " + check_name + " with Frequency of " + str(frequency)
                                             status[sid]["problems"].append([speed + str(num + 1), "采样率非8000Hz"])
                                     else:
                                         # Wrong Depth
-                                        print "Failure: " + check_name + " with Depth of " + str(depth * 8)
+                                        # print "Failure: " + check_name + " with Depth of " + str(depth * 8)
                                         status[sid]["problems"].append([speed + str(num + 1), "位深度非16位"])
                                 else:
                                     # Wrong nChannels
-                                    print "Failure: " + check_name + " with Channels of " + str(nChannels)
-                                    status[sid]["problems"].append([speed + str(num + 1), "非单通道"])
+                                    if str_week in ['W1', 'W2', 'W3', 'W4'] and nChannels == 2:
+                                        # Regard it as passed
+                                        shutil.copy(file_path, os.path.join(dir_sid_result, check_name))
+                                        continue
+                                    else:
+                                        # print "Failure: " + check_name + " with Channels of " + str(nChannels)
+                                        status[sid]["problems"].append([speed + str(num + 1), "非单通道"])
                             except:
-                                print "Fail to open file: " + file_path
+                                # print "Fail to open file: " + file_path
                                 status[sid]["problems"].append([speed + str(num + 1), "无法读取"])
                         else:
                             # Miss file
-                            print "Failure: " + check_name + " Not Found"
+                            # print "Failure: " + check_name + " Not Found"
                             status[sid]["problems"].append([speed + str(num + 1), "格式或命名错误"])
                         status[sid]["status"] = "存在错误"
             else:
@@ -99,3 +105,5 @@ for str_week in weeks:
     finally:
         if f:
             f.close()
+
+    print str_week + ": Finished."
