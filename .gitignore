@@ -105,3 +105,15 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+.idea/
+old.py
+old2.py
+report/
+result.txt
+result/
+"sample - \345\211\257\346\234\254 (3) - \345\211\257\346\234\254/"
+sample-old/
+sample/
+statistc.txt
+test.py
+sid.txt
